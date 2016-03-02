@@ -4,9 +4,11 @@
 const express = require('express');
 const mongojs = require('mongojs');
 const db = mongojs('catalog', ['products']);
+const bodyParser = require('body-parser');
 
 const app = express();
 
+app.use(bodyParser.json());
 
 app.get('/', (req, res) => {
     res.send("Success!")
@@ -31,6 +33,22 @@ app.get('/products/:id', (req, res) => {
 
         console.log("Sending product...");
         res.json(body);
+    });
+});
+
+app.post('/products', (req, res) => {
+    db.products.insert(req.body, (err, doc) => {
+        if (err) throw err;
+
+        res.json(doc)
+    });
+});
+
+app.put('/products/:id', (req, res) => {
+    db.products.findAndModify({query: {_id: mongojs.ObjectId(req.params.id)}}, (err, doc) => {
+        if (err) throw err;
+
+        res.json(doc)
     });
 });
 
